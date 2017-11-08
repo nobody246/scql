@@ -119,7 +119,7 @@
                                                                   (if first  
                                                                      (string-append " " type " ") 
                                                                      (string-append processed-str " " (car clause) " "))
-                                                                  ((if first cadr caddr) clause)  ((if first car cadr) clause) ((if first caddr cadddr) clause)))
+                                                                  ((if first cadr caddr) clause) " "  ((if first car cadr) clause) " " ((if first caddr cadddr) clause)))
                                             (process-clause type 
                                                             ((if first cdddr cddddr) clause) 
                                                             processed-str))
