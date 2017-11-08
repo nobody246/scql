@@ -301,7 +301,8 @@
                                                  (if (and (not (eq? as #f))
                                                           (not (equal? as "")))
                                                      (throw-exception "Invalid Query Syntax: `as` clause given to a non-nested select query (use `->sel` or `->select`)")
-                                                     "")))))
+                                                     "")) 
+                                             ";")))
                     
                     (define (construct-upd-query)
                             (let* ((vals  (begin (if (< (length exp) 1)
@@ -389,7 +390,8 @@
                                                      (if (and (string? limit)
                                                               (> (string-length limit) 0))
                                                          (string-append " limit " limit)
-                                                         "")))))
+                                                         ""))
+                                                 ";")))
                                                                                    
                                   
                     (define (construct-del-query)
@@ -442,7 +444,7 @@
                                                      (if (and (string? limit)
                                                               (> (string-length limit) 0))
                                                          (string-append " limit " limit)
-                                                         "")))))
+                                                         ""))";")))
                             
                     (define (construct-ins-query)
                             (let* ((pairs    (begin (if (<= (length exp) 0)
@@ -469,7 +471,7 @@
                                                      (get-flds-and-vals (cddr pairs)))))
                                   (get-flds-and-vals pairs)
                                   (string-append (process-insert-cols (append (list table) flds)) " values ("
-                                                 (string-join vals ",") ")")))
+                                                 (string-join vals ",") ");")))
                     
                     (define (construct-cre-tmp-query)
                             (let* ((table-name (if (>= (length exp) 1)
@@ -477,7 +479,7 @@
                                                    (throw-exception 
                                                      (string-append "Invalid Query Syntax: `create-tmp` clause expects a string or symbol defining name of table name")))))
                                   (set! exp (cdr exp))
-                                  (string-append "create temporary table " table-name " " (construct-sel-query))))
+                                  (string-append "create temporary table " table-name " " (construct-sel-query) ";")))
                             
                     
                     (define (process-param #!key current-command ;list of command currently being processed it's abbreviations
