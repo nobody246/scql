@@ -99,7 +99,7 @@
                                        (define (p-j join-list p-str)
                                                     (if (>= (length join-list) 2)
                                                         (begin (set! p-str (sprintf "~A ~A ~A ~A ~A " 
-                                                                                    p-str (car join-list) "join" (cadr join-list) (p-o (car on))))
+                                                                                    p-str (car join-list) "join" (cadr join-list) (p-o (car on) "")))
                                                                (set! on (cdr on))
                                                                (p-j (cddr join-list) p-str))
                                                         p-str))
@@ -124,7 +124,7 @@
                               (if (or (and first (>= (length clause) 3))
                                       (and (not first) (>= (length clause) 4)))
                                   (begin (set! processed-str 
-                                               (sprintf "~A ~A ~A ~A "
+                                               (sprintf " ~A ~A ~A ~A "
                                                  (if first type (sprintf " ~A ~A " processed-str (car clause)))
                                                  ((if first cadr caddr) clause) 
                                                  ((if first car cadr) clause) 
@@ -244,7 +244,7 @@
                                    (limit    (cadddr (cddddr processed-results)))
                                    (as       (cadddr (cddddr (cdr processed-results))))
                                    (insert   (cadddr (cddddr (cddr processed-results)))))
-                            (sprintf "~A ~A select ~A from ~A~A~A~A~A~A~A~A; ~A" 
+                            (sprintf "~A~Aselect ~A from ~A~A~A~A~A~A~A~A~A" 
                               (if nested "(" "")
                               (if (list? insert) 
                                   (if (>= (length insert) 2)
@@ -258,8 +258,8 @@
                                       (sprintf "~A ~A " "insert into" insert) 
                                       ""))
                                (if (list? cols) (string-join cols ",") cols)
-                               (if (list? tables) (string-join tables ",") tables)
-                               (if (and (list? join) (list? on)) (process-join join on) "")
+                               (sprintf "~A " (if (list? tables) (string-join tables ",") tables))
+                               (sprintf "~A " (if (and (list? join) (list? on)) (process-join join on) ""))
                                (if (list? where-clause) (process-clause 'where where-clause "")
                                    (if (and (string? where-clause) (> (string-length where-clause) 0))
                                        (sprintf "~A ~A " "where" where-clause)
@@ -271,7 +271,7 @@
                                    (process-clause 'having having-clause "")
                                    (if (and (string? having-clause)
                                             (> (string-length having-clause) 0))
-                                       (sprintf "~A ~A " "having" having-clause)
+                                       (sprintf " ~A ~A " "having" having-clause)
                                        ""))
                                (if (list? order-by) 
                                    (sprintf "~A ~A " "order by" (process-order-by order-by ""))
@@ -291,7 +291,7 @@
                                            (throw-exception (sprintf "~A ~A "
                                                                      "Invalid Query Syntax: `as` clause given to a non-nested"
                                                                      "select query (use `->sel` or `->select`)"))
-                                           "")))))
+                                           ";")))))
                     
                     (define (construct-upd-query)
                             (let* ((vals  
@@ -470,7 +470,7 @@
                                                      (sprintf "Invalid Query Syntax: `create-tmp` clause expects a string or symbol ~A "
                                                               "defining name of table name")))))
                                   (set! exp (cdr exp))
-                                  (sprintf "~A ~A ~A; " "create temporary table" table-name (construct-sel-query))))
+                                  (sprintf "~A ~A ~A " "create temporary table" table-name (construct-sel-query))))
                             
                     
                     (define (process-param #!key current-command ;list of command currently being processed it's abbreviations
