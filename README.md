@@ -4,8 +4,12 @@ A Macro to Write Select/Update/Delete/Insert/Create Temp Table MySQL queries dir
 
 I'm **not** necessarily recommending anybody actually use it, it's still rough.
 
+# syntax abbreviations
+select, from , join, where, having, group-by , order-by, limit, insert commands can respectively be abbreviated to
+sel, fr, jo, wh, ha, gr-by or-by, lim, ins
 
-#to include  
+
+# to include  
 
 (include "scql.scm")
 
