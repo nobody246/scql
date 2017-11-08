@@ -2,7 +2,12 @@
 
 A Macro to Write Select/Update/Delete/Insert/Create Temp Table MySQL queries directly in Scheme. It allows me to write the SQL queries I most often use in a quick fashion, without losing syntax highlighting and with compile time checking of missing or malformed clauses. Only parameterized queries will work, as SQL strings are generated at compilation.
 
-to include : (include "scql.scm")
+I'm **not** necessarily recommending anybody actually use it, it's still rough.
+
+
+#to include  
+
+(include "scql.scm")
 
 # select
 
