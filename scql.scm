@@ -14,11 +14,8 @@
              (throw-exception "Invalid Query Syntax: A level command is required (i,e: select, create, update or delete ,etc.. rtfm for more info)"))
          (let ((top-command (cadr exp))
                (exp (cddr exp))
-               (str "")
-               (symbol-parent-names '())) ;keep track of symbol's parents, if a symbol evaluates to variable referencing a list,
-                                          ;keep the name of that list (AKA the "parent") so that in each child element being processed we can catch 
-                                          ;circular references and avoid an infinite loop
-              (define (process-parse-symbol v)
+               (str ""))
+              (define (parse-symbol v)
                       (let* ((is-defined   (eval `(condition-case ((lambda () ,v #t)) 
                                                                   [(exn) #f])))
                              (procedure-name (if (and is-defined (not (string? v)))
@@ -50,11 +47,11 @@
                                                                                "The scheme list named `" x "` contains a reference to itself."
                                                                                "If you meant to define the literal \"" x "\", enclose it in quotes."))))))
                                               evaluated-parent)
-                                         (set! v (map process-parse-symbol evaluated-parent)))) ;we got passed the errors, process list
+                                         (set! v (map parse-symbol evaluated-parent)))) ;we got passed the errors, process list
                                   ((list? v) ;literal list
                                    (if (eq? (car v) 'quote)
-                                       (set! v (process-parse-symbol (car (cdr v))))
-                                       (set! v (map process-parse-symbol v))))
+                                       (set! v (parse-symbol (car (cdr v))))
+                                       (set! v (map parse-symbol v))))
                                   ((string? v) ;literal string
                                    (void)) ;just return v, catch the `cond` statement, so it doesnt go to else
                                   (is-number
@@ -64,12 +61,6 @@
                                   (else
                                    (set! v (symbol->string  v))))
                             v))
-                    
-                    (define (parse-symbol v)
-                            (let ((v (process-parse-symbol v)))
-                                 (set! symbol-parent-names '())
-                                 v))
-                            
                     
                     (define (process-join join on)
                             (let ((processed-str ""))
