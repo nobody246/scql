@@ -180,59 +180,61 @@
                                                             (throw-exception "Invalid Query Syntax: `From` clause expected after column(s) definition."))
                                                         a)))
                                    ;params for sql-parameter processing
-                                   (processed-results (map (lambda (args)
-                                                                   (process-param current-command: (car (cdr (car args)))
-                                                                                  allowed-next-commands: (car (cdr (cadr args)))
-                                                                                  allowed-last-commands: (car (cdr (caddr args)))
-                                                                                  return-checks: (car (cdr (cadddr args)))
-                                                                                  allowed-next-command-error: (cadddr (cdr args))
-                                                                                  return-check-error: (cadddr (cddr args))))
-                                                           (list '('(from fr) ;select clause
-                                                                 '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins) '() 
-                                                                 '(list? string?)
-                                                                 "Invalid Query Syntax: Expected one or more: `join`,`group-by`,`where`, `having`, `limit`, `order-by`, `insert` clauses."
-                                                                 "Invalid Query Syntax: List or string expected in `From` clause.")
-                                                                 '('(join jo) '(on) '()  ; join clause
-                                                                 '(list?)
-                                                                 "Invalid Query Syntax: Expected`on` clause"
-                                                                 "Invalid Query Syntax: List expected in `join` clause.")
-                                                                 '('(on) ;on clause
-                                                                 '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins)  '(join)
-                                                                 '(list?)
-                                                                 "Invalid Query Syntax: Expected one or more of: Group-by Where, Having, Limit, Insert Clauses, not found."
-                                                                 "Invalid Query Syntax: List expected in `on` clause.")
-                                                                 '('(where wh) ;where clause
-                                                                 '(as group-by gr-by having ha limit lim order-by or-by insert ins)  '() 
-                                                                 '(list? string?) 
-                                                                 "Invalid Query Syntax: Expected one or more: `group-by`, `having`, `limit`, `order-by`, `insert` following `where` clauses."
-                                                                 "Invalid Query Syntax: List expected in `having` clause.")
-                                                                 '('(group-by gr-by)
-                                                                 '(as having ha limit lim order-by or-by insert ins) '() 
-                                                                 '(list? string?)
-                                                                 "Invalid Query Syntax: Expected one or more: `limit`, `order-by`, `insert` clauses following `group-by` clause."
-                                                                 "Invalid Query Syntax: List, string, or symbol expected as argument to `group-by` clause.")
-                                                                 '('(having ha)
-                                                                 '(as group-by gr-by limit lim order-by or-by insert ins) '() 
-                                                                 '(list? string?)
-                                                                 "Invalid Query Syntax: Expected one or more: `group-by`, `limit`, `order-by`, `insert` clauses following `having` clause."
-                                                                 "Invalid Query Syntax: List expected in `having` clause.")
-                                                                 '('(order-by or-by)
-                                                                 '(limit lim insert ins) '() 
-                                                                 '(list? string?) 
-                                                                 "Invalid Query Syntax: Expected one or more: `limit`, `insert` clauses following `order-by` clause."
-                                                                 "Invalid Query Syntax: List, string, or symbol expected as argument to `order-by` clause.")
-                                                                 '('(limit lim)
-                                                                 '(as insert ins) '() 
-                                                                 '(list? string?)
-                                                                 "Invalid Query Syntax: Expected  `insert` clauses following `limit` clause."
-                                                                 "Invalid Query Syntax: List, string, or symbol expected as argument to `limit` clause.")
-                                                                 '('(as) 
-                                                                 '(insert ins)  '() 
-                                                                 '(string?) '()
-                                                                 "Invalid Query Syntax: String or symbol expected as argument to `as` clause.")
-                                                                 '('(insert ins) '()  '() 
-                                                                 '(list? string?) '()
-                                                                 "Invalid Query Syntax: List, string, or symbol expected as argument to `insert` clause."))))
+                                   (processed-results 
+                                     (map 
+                                       (lambda (args)
+                                         (process-param current-command: (car (cdr (car args)))
+                                                        allowed-next-commands: (car (cdr (cadr args)))
+                                                        allowed-last-commands: (car (cdr (caddr args)))
+                                                        return-checks: (car (cdr (cadddr args)))
+                                                        allowed-next-command-error: (cadddr (cdr args))
+                                                        return-check-error: (cadddr (cddr args))))
+                                       (list '('(from fr) ;select clause
+                                               '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins) '() 
+                                               '(list? string?)
+                                               "Invalid Query Syntax: Expected one or more: `join`,`group-by`,`where`, `having`, `limit`, `order-by`, `insert` clauses."
+                                               "Invalid Query Syntax: List or string expected in `From` clause.")
+                                             '('(join jo) '(on) '()  ; join clause
+                                               '(list?)
+                                               "Invalid Query Syntax: Expected`on` clause"
+                                               "Invalid Query Syntax: List expected in `join` clause.")
+                                             '('(on) ;on clause
+                                               '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins)  '(join)
+                                               '(list?)
+                                               "Invalid Query Syntax: Expected one or more of: Group-by Where, Having, Limit, Insert Clauses, not found."
+                                               "Invalid Query Syntax: List expected in `on` clause.")
+                                             '('(where wh) ;where clause
+                                               '(as group-by gr-by having ha limit lim order-by or-by insert ins)  '() 
+                                               '(list? string?) 
+                                               "Invalid Query Syntax: Expected one or more: `group-by`, `having`, `limit`, `order-by`, `insert` following `where` clauses."
+                                               "Invalid Query Syntax: List expected in `having` clause.")
+                                             '('(group-by gr-by)
+                                               '(as having ha limit lim order-by or-by insert ins) '() 
+                                               '(list? string?)
+                                               "Invalid Query Syntax: Expected one or more: `limit`, `order-by`, `insert` clauses following `group-by` clause."
+                                               "Invalid Query Syntax: List, string, or symbol expected as argument to `group-by` clause.")
+                                             '('(having ha)
+                                               '(as group-by gr-by limit lim order-by or-by insert ins) '() 
+                                               '(list? string?)
+                                               "Invalid Query Syntax: Expected one or more: `group-by`, `limit`, `order-by`, `insert` clauses following `having` clause."
+                                               "Invalid Query Syntax: List expected in `having` clause.")
+                                             '('(order-by or-by)
+                                               '(limit lim insert ins) '() 
+                                               '(list? string?) 
+                                               "Invalid Query Syntax: Expected one or more: `limit`, `insert` clauses following `order-by` clause."
+                                               "Invalid Query Syntax: List, string, or symbol expected as argument to `order-by` clause.")
+                                             '('(limit lim)
+                                               '(as insert ins) '() 
+                                               '(list? string?)
+                                               "Invalid Query Syntax: Expected  `insert` clauses following `limit` clause."
+                                               "Invalid Query Syntax: List, string, or symbol expected as argument to `limit` clause.")
+                                             '('(as) 
+                                               '(insert ins)  '() 
+                                               '(string?) '()
+                                               "Invalid Query Syntax: String or symbol expected as argument to `as` clause.")
+                                             '('(insert ins) '()  '() 
+                                               '(list? string?) '()
+                                               "Invalid Query Syntax: List, string, or symbol expected as argument to `insert` clause."))))
                                    (tables (car processed-results))
                                    (join (cadr processed-results))
                                    (on  (caddr processed-results))
@@ -300,60 +302,67 @@
                                                      "")
                                                  (if (and (not (eq? as #f))
                                                           (not (equal? as "")))
-                                                     (throw-exception "Invalid Query Syntax: `as` clause given to a non-nested select query (use `->sel` or `->select`)")
+                                                     (throw-exception (string-append "Invalid Query Syntax: `as` clause given to a non-nested "
+                                                                                     "select query (use `->sel` or `->select`)"))
                                                      "")) 
                                              ";")))
                     
                     (define (construct-upd-query)
-                            (let* ((vals  (begin (if (< (length exp) 1)
-                                                     (throw-exception "Invalid Query Syntax: Values definition is required."))
-                                                 (let ((a (parse-symbol (car exp))))
-                                                      (if (not (or (list? a) (string? a)))
-                                                          (throw-exception "Invalid Query Syntax: Values definition is of an invalid type.")
-                                                          (if (and (list? a)
-                                                                   (not (even? (sub1 (length a)))))
-                                                              (throw-exception (string-append "Invalid Query Syntax: Values definition (elements following first element which is table "
-                                                                                              "definition must be a list of even length with each 2 values representing a column/value pair."))))
-                                                      (if (>= (length exp) 1)
-                                                          (set! exp (cdr exp))
-                                                          (throw-exception "Invalid Query Syntax: Values definition expected after table definition."))
-                                                      a)))
-                                   (processed-results (map (lambda (args)
-                                                                   (process-param current-command: (car (cdr (car args)))
-                                                                                  allowed-next-commands: (car (cdr (cadr args)))
-                                                                                  allowed-last-commands: (car (cdr (caddr args)))
-                                                                                  return-checks: (car (cdr (cadddr args)))
-                                                                                  allowed-next-command-error: (cadddr (cdr args))
-                                                                                  return-check-error: (cadddr (cddr args))))
-                                                           (list  '('(join jo) '(on) '()  ; join clause
-                                                                    '(list?)
-                                                                    "Invalid Query Syntax: Expected`on` clause"
-                                                                    "Invalid Query Syntax: List expected in `join` clause.")
-                                                                  '('(on) ;on clause
-                                                                    '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins)  '(join)
-                                                                    '(list?)
-                                                                    "Invalid Query Syntax: Expected one or more of: Group-by Where, Having, Limit, Insert Clauses, not found."
-                                                                    "Invalid Query Syntax: List expected in `on` clause.")
-                                                                  '('(where wh) ;where clause
-                                                                    '(having ha limit lim order-by or-by)  '() 
-                                                                    '(list? string?) 
-                                                                    "Invalid Query Syntax: Expected one or more: `group-by`, `having`, `limit`, `order-by`, `insert` following `where` clauses."
-                                                                    "Invalid Query Syntax: List expected in `having` clause.")
-                                                                  '('(having ha)
-                                                                    '(limit lim order-by or-by) '() 
-                                                                    '(list? string?)
-                                                                    "Invalid Query Syntax: Expected one or more: `group-by`, `limit`, `order-by`, `insert` clauses following `having` clause."
-                                                                    "Invalid Query Syntax: List expected in `having` clause.")
-                                                                  '('(order-by or-by)
-                                                                    '(limit lim) '() 
-                                                                    '(list? string?) 
-                                                                    "Invalid Query Syntax: Expected one or more: `limit`, `insert` clauses following `order-by` clause."
-                                                                    "Invalid Query Syntax: List, string, or symbol expected as argument to `order-by` clause.")
-                                                                  '('(limit lim)
-                                                                    '() '() 
-                                                                    '(list? string?)
-                                                                    "Invalid Query Syntax: Expected  `insert` clauses following `limit` clause."
-                                                                    "Invalid Query Syntax: List, string, or symbol expected as argument to `limit` clause."))))
+                            (let* ((vals  
+                                     (begin 
+                                       (if (< (length exp) 1)
+                                           (throw-exception "Invalid Query Syntax: Values definition is required."))
+                                       (let 
+                                         ((a (parse-symbol (car exp))))
+                                         (if (not (or (list? a) (string? a)))
+                                             (throw-exception "Invalid Query Syntax: Values definition is of an invalid type.")
+                                             (if (and (list? a)
+                                                      (not (even? (sub1 (length a)))))
+                                                 (throw-exception (string-append "Invalid Query Syntax: Values definition (elements "
+                                                                                 "following first element which is table "
+                                                                                 "definition must be a list of even length with each 2 "
+                                                                                 "values representing a column/value pair."))))
+                                         (if (>= (length exp) 1)
+                                             (set! exp (cdr exp))
+                                             (throw-exception "Invalid Query Syntax: Values definition expected after table definition."))
+                                         a)))
+                                   (processed-results 
+                                     (map (lambda (args)
+                                                  (process-param current-command: (car (cdr (car args)))
+                                                                 allowed-next-commands: (car (cdr (cadr args)))
+                                                                 allowed-last-commands: (car (cdr (caddr args)))
+                                                                 return-checks: (car (cdr (cadddr args)))
+                                                                 allowed-next-command-error: (cadddr (cdr args))
+                                                                 return-check-error: (cadddr (cddr args))))
+                                          (list  '('(join jo) '(on) '()  ; join clause
+                                                   '(list?)
+                                                   "Invalid Query Syntax: Expected`on` clause"
+                                                   "Invalid Query Syntax: List expected in `join` clause.")
+                                                 '('(on) ;on clause
+                                                   '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins)  '(join)
+                                                   '(list?)
+                                                   "Invalid Query Syntax: Expected one or more of: Group-by Where, Having, Limit, Insert Clauses, not found."
+                                                   "Invalid Query Syntax: List expected in `on` clause.")
+                                                 '('(where wh) ;where clause
+                                                   '(having ha limit lim order-by or-by)  '() 
+                                                   '(list? string?) 
+                                                   "Invalid Query Syntax: Expected one or more: `group-by`, `having`, `limit`, `order-by`, `insert` following `where` clauses."
+                                                   "Invalid Query Syntax: List expected in `having` clause.")
+                                                 '('(having ha)
+                                                   '(limit lim order-by or-by) '() 
+                                                   '(list? string?)
+                                                   "Invalid Query Syntax: Expected one or more: `group-by`, `limit`, `order-by`, `insert` clauses following `having` clause."
+                                                   "Invalid Query Syntax: List expected in `having` clause.")
+                                                 '('(order-by or-by)
+                                                   '(limit lim) '() 
+                                                   '(list? string?) 
+                                                   "Invalid Query Syntax: Expected one or more: `limit`, `insert` clauses following `order-by` clause."
+                                                   "Invalid Query Syntax: List, string, or symbol expected as argument to `order-by` clause.")
+                                                 '('(limit lim)
+                                                   '() '() 
+                                                   '(list? string?)
+                                                   "Invalid Query Syntax: Expected  `insert` clauses following `limit` clause."
+                                                   "Invalid Query Syntax: List, string, or symbol expected as argument to `limit` clause."))))
                                    (join  (car processed-results))
                                    (on    (cadr processed-results))
                                    (where-clause (caddr processed-results))
