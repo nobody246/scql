@@ -17,39 +17,39 @@
                                                 ;keep the name of that list (AKA the "parent") so that in each child element being processed we can catch 
                                                 ;circular references and avoid an infinite loop
                     (define (process-parse-symbol v)
-                                     (let* ((is-defined   (eval `(condition-case ((lambda () ,v #t)) 
-                                                                                        [(exn) #f])))
-                                            (procedure-name (if (and is-defined (not (string? v)))
-                                                                (eval `(condition-case ((lambda () 
-                                                                                          (car (string->symbol (procedure-information ,v))))) 
-                                                                                       [(exn) #f ]
-                                                                                       [var () (string->symbol (car (procedure-information ,v)))]))
-                                                                #f))
-                                            (is-procedure (eq? procedure-name #t))
-                                            (v (if is-procedure procedure-name v))
-                                            (do-check is-defined )
-                                            (is-number    (if do-check (eval `(number? ,v)) #f))
-                                            (is-string    (if do-check (eval `(string? ,v)) #f))
-                                            (is-list      (if do-check (eval `(list?  ,v)) #f))
-                                            (is-symbol    (if do-check (eval `(symbol? ,v)) #f)))
-                                           (cond (is-string
-                                                  (set! v (eval v)))
-                                                 (is-list ;variable referencing a list
-                                                  ;prevent a situation where we get caught in an endless loop
-                                                  (let ((evaluated-parent (eval v))) ;evaluated `parent` values
-                                                       (map (lambda (x) 
-                                                                    (let ((evaluated-child (eval `(condition-case ((lambda() ,x)) [(exn) #f]))))
-                                                                         (if (equal? evaluated-child evaluated-parent)
-                                                                             (let ((x (symbol->string x)))
-                                                                                  (throw-exception 
-                                                                                    (string-append "Invalid Query Syntax: A circular reference was detected. "
-                                                                                                   "The scheme list named `" x "` contains a reference to itself.  "
-                                                                                                   "If you meant to define the literal \"" x "\", enclose it in quotes."))))))
-                                                            evaluated-parent)
-                                                       (set! v (map process-parse-symbol evaluated-parent)))) ;we got passed the errors, process list
-                                                 ((list? v) ;literal list
-                                                  (if (eq? (car v) 'quote)
-                                                      (set! v (process-parse-symbol (car (cdr v))))
+                            (let* ((is-defined   (eval `(condition-case ((lambda () ,v #t)) 
+                                                                        [(exn) #f])))
+                                   (procedure-name (if (and is-defined (not (string? v)))
+                                                       (eval `(condition-case ((lambda () 
+                                                               (car (string->symbol (procedure-information ,v))))) 
+                                                                                    [(exn) #f ]
+                                                                                    [var () (string->symbol (car (procedure-information ,v)))]))
+                                                       #f))
+                                   (is-procedure (eq? procedure-name #t))
+                                   (v (if is-procedure procedure-name v))
+                                   (do-check is-defined )
+                                   (is-number    (if do-check (eval `(number? ,v)) #f))
+                                   (is-string    (if do-check (eval `(string? ,v)) #f))
+                                   (is-list      (if do-check (eval `(list?  ,v)) #f))
+                                   (is-symbol    (if do-check (eval `(symbol? ,v)) #f)))
+                                  (cond (is-string
+                                          (set! v (eval v)))
+                                        (is-list ;variable referencing a list
+                                                 ;prevent a situation where we get caught in an endless loop
+                                          (let ((evaluated-parent (eval v))) ;evaluated `parent` values
+                                               (map (lambda (x) 
+                                                            (let ((evaluated-child (eval `(condition-case ((lambda() ,x)) [(exn) #f]))))
+                                                                 (if (equal? evaluated-child evaluated-parent)
+                                                                     (let ((x (symbol->string x)))
+                                                                          (throw-exception 
+                                                                            (string-append "Invalid Query Syntax: A circular reference was detected. "
+                                                                                           "The scheme list named `" x "` contains a reference to itself.  "
+                                                                                           "If you meant to define the literal \"" x "\", enclose it in quotes."))))))
+                                                    evaluated-parent)
+                                               (set! v (map process-parse-symbol evaluated-parent)))) ;we got passed the errors, process list
+                                        ((list? v) ;literal list
+                                         (if (eq? (car v) 'quote)
+                                                     (set! v (process-parse-symbol (car (cdr v))))
                                                       (set! v (map process-parse-symbol v))))
                                                  ((string? v) ;literal string
                                                   (void)) ;just return v, catch the `cond` statement, so it doesnt go to else
