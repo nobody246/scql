@@ -88,7 +88,7 @@
                                                                  "[...]), Subsequent additions to that clause require 4 elements (<logical operator and/or/etc.>"
                                                                  "<operator> <col> <val> [...])"))))
                                               (if (>= (length on-list) (if first 3 4))
-                                                  (begin (set! p-str (sprintf "~A ~A ~A ~A ~A "
+                                                  (begin (set! p-str (sprintf "~A ~A ~A ~A ~A"
                                                                               p-str 
                                                                               (if first "on" (car on-list)) 
                                                                               (if first (cadr on-list) (caddr on-list)) 
@@ -98,7 +98,7 @@
                                                   p-str)))
                                        (define (p-j join-list p-str)
                                                     (if (>= (length join-list) 2)
-                                                        (begin (set! p-str (sprintf "~A ~A ~A ~A ~A " 
+                                                        (begin (set! p-str (sprintf "~A ~A ~A ~A ~A" 
                                                                                     p-str (car join-list) "join" (cadr join-list) (p-o (car on) "")))
                                                                (set! on (cdr on))
                                                                (p-j (cddr join-list) p-str))
@@ -124,8 +124,8 @@
                               (if (or (and first (>= (length clause) 3))
                                       (and (not first) (>= (length clause) 4)))
                                   (begin (set! processed-str 
-                                               (sprintf " ~A ~A ~A ~A "
-                                                 (if first type (sprintf " ~A ~A " processed-str (car clause)))
+                                               (sprintf " ~A ~A ~A ~A"
+                                                 (if first type (sprintf "~A ~A" processed-str (car clause)))
                                                  ((if first cadr caddr) clause) 
                                                  ((if first car cadr) clause) 
                                                  ((if first caddr cadddr) clause)))
@@ -141,7 +141,7 @@
                                      (begin (if (and first
                                                      (not (even? (length order-by))))
                                                 (throw-exception 
-                                                    (sprintf "~A ~A "
+                                                    (sprintf " ~A ~A "
                                                              "Invalid Query Syntax: `Order-by` clause requires a string or a list of even length defining"
                                                              "pairs: the first element being the column name, the second being the order (asc or desc)"))
                                                 (set! processed-str (sprintf "~A ~A ~A ~A " processed-str (if first "" ",") (car order-by) (car (cdr order-by)))))
@@ -157,14 +157,15 @@
                     (define (process-update-cols vals processed-str)
                             (let ((first (equal? processed-str "")))
                                  (if (>= (length vals) 2)
-                                     (begin (set! processed-str (sprintf "~A ~A ~A ~A ~A"
+                                     (begin (set! processed-str (sprintf "~A~A ~A ~A ~A"
                                                                          processed-str  (if first "" ",")
                                                                          (car vals) "=" (cadr vals)))
                                             (process-update-cols (cddr vals) processed-str))
                                      (if (not first)
-                                         (sprintf " set ~A " processed-str)
+                                         (sprintf "set ~A" processed-str)
                                          processed-str))))
-
+                    
+                    
                     (define (construct-sel-query)
                             (let* ((nested (or (eq? top-command  '->sel)
                                                (eq? top-command  '->select)))
@@ -258,33 +259,33 @@
                                       (sprintf "~A ~A " "insert into" insert) 
                                       ""))
                                (if (list? cols) (string-join cols ",") cols)
-                               (sprintf "~A " (if (list? tables) (string-join tables ",") tables))
-                               (sprintf "~A " (if (and (list? join) (list? on)) (process-join join on) ""))
+                               (if (list? tables) (string-join tables ",") tables)
+                               (if (and (list? join) (list? on)) (process-join join on) "")
                                (if (list? where-clause) (process-clause 'where where-clause "")
                                    (if (and (string? where-clause) (> (string-length where-clause) 0))
-                                       (sprintf "~A ~A " "where" where-clause)
+                                       (sprintf "~A ~A" "where" where-clause)
                                    ""))
                                (if (list? group-by)
-                                   (if (> (length group-by) 0) (sprintf "~A ~A " "group by " (string-join group-by ",")) "")
-                                   (if (and (string? group-by) (> (string-length group-by) 0)) (sprintf "~A ~A " "group by" group-by) ""))
+                                   (if (> (length group-by) 0) (sprintf " group by ~A " (string-join group-by ",")) "")
+                                   (if (and (string? group-by) (> (string-length group-by) 0)) (sprintf " group by ~A " group-by) ""))
                                (if (list? having-clause)     
                                    (process-clause 'having having-clause "")
                                    (if (and (string? having-clause)
                                             (> (string-length having-clause) 0))
-                                       (sprintf " ~A ~A " "having" having-clause)
+                                       (sprintf "~A ~A" "having" having-clause)
                                        ""))
                                (if (list? order-by) 
-                                   (sprintf "~A ~A " "order by" (process-order-by order-by ""))
+                                   (sprintf "~A ~A" "order by" (process-order-by order-by ""))
                                    (if (and (string? order-by) (> (string-length order-by) 0))
-                                       (sprintf "~A ~A " "order by" order-by) ""))
+                                       (sprintf " ~A ~A " "order by" order-by) ""))
                                (if (list? limit) 
-                                   (sprintf "~A ~A " "limit" (string-join limit ","))
+                                   (sprintf " ~A ~A " "limit" (string-join limit ","))
                                    (if (and (string? limit) (> (string-length limit) 0))
-                                       (sprintf "~A ~A " "limit" limit) ""))
+                                       (sprintf " ~A ~A " "limit" limit) ""))
                                (if nested ")" "")
                                    (if (and nested (string? as))
                                        (if (> (string-length as) 0)
-                                           (sprintf "~A ~A " "as" as)
+                                           (sprintf " ~A ~A " "as" as)
                                            "")
                                        (if (and (not (eq? as #f))
                                                 (not (equal? as "")))
@@ -326,19 +327,19 @@
                                               "Invalid Query Syntax: Expected`on` clause"
                                               "Invalid Query Syntax: List expected in `join` clause.")
                                             '('(on) ;on clause
-                                              '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins)  '(join)
+                                              '(as join jo where wh having ha limit lim order-by or-by insert ins)  '(join)
                                               '(list?)
-                                              "Invalid Query Syntax: Expected one or more of: Group-by Where, Having, Limit, Insert Clauses, not found."
+                                              "Invalid Query Syntax: Expected one or more of:Where, Having, Limit, Insert Clauses, not found."
                                               "Invalid Query Syntax: List expected in `on` clause.")
                                             '('(where wh) ;where clause
                                               '(having ha limit lim order-by or-by)  '() 
                                               '(list? string?) 
-                                              "Invalid Query Syntax: Expected one or more: `group-by`, `having`, `limit`, `order-by`, `insert` following `where` clauses."
+                                              "Invalid Query Syntax: Expected one or more: `having`, `limit`, `order-by`, `insert` following `where` clauses."
                                               "Invalid Query Syntax: List expected in `having` clause.")
                                             '('(having ha)
                                               '(limit lim order-by or-by) '() 
                                               '(list? string?)
-                                              "Invalid Query Syntax: Expected one or more: `group-by`, `limit`, `order-by`, `insert` clauses following `having` clause."
+                                              "Invalid Query Syntax: Expected one or more:  `limit`, `order-by`, `insert` clauses following `having` clause."
                                               "Invalid Query Syntax: List expected in `having` clause.")
                                             '('(order-by or-by)
                                               '(limit lim) '() 
@@ -359,24 +360,24 @@
                                   (sprintf "update ~A~A~A~A~A~A;"
                                            (if (string? vals)
                                                vals
-                                               (sprintf "~A ~A " (car vals) (process-update-cols (cdr vals) "")))
+                                               (sprintf "~A ~A" (car vals) (process-update-cols (cdr vals) "")))
                                            (if (and (list? join) (list? on))
                                                (process-join join on)
                                                "")
                                            (if (list? where-clause) 
                                                (process-clause 'where where-clause "")
                                                (if (and (string? where-clause) (> (string-length where-clause) 0))
-                                                   (sprintf "~A ~A " "where" where-clause)
+                                                   (sprintf "~A ~A" "where" where-clause)
                                                    ""))
                                            (if (list? having-clause) 
                                                (process-clause 'having having-clause "")
                                                (if (and (string? having-clause) (> (string-length having-clause) 0))
-                                                   (sprintf "~A ~A " "having" having-clause)
+                                                   (sprintf "~A ~A" "having" having-clause)
                                                    ""))
                                            (if (list? order-by) 
-                                               (sprintf "~A ~A " "order by" (process-order-by order-by ""))
+                                               (sprintf "~A ~A" "order by" (process-order-by order-by ""))
                                                (if (and (string? order-by) (> (string-length order-by) 0))
-                                                   (sprintf "~A ~A " "order by" order-by)
+                                                   (sprintf "~A ~A" "order by" order-by)
                                                    ""))
                                            (if (list? limit) 
                                                (sprintf "~A ~A " "limit" (string-join limit ","))
@@ -422,18 +423,18 @@
                                           (if (list? where-clause) 
                                               (process-clause 'where where-clause "")
                                               (if (and (string? where-clause) (> (string-length where-clause) 0))
-                                                  (sprintf "~A ~A " "where" where-clause)
+                                                  (sprintf "~A ~A" "where" where-clause)
                                                   ""))
                                           (if (list? order-by) 
-                                              (sprintf "~A ~A " "order by" (process-order-by order-by ""))
+                                              (sprintf "~A ~A" "order by" (process-order-by order-by ""))
                                               (if (and (string? order-by) (> (string-length order-by) 0))
-                                                  (sprintf "~A ~A " "order by" order-by)
+                                                  (sprintf "~A ~A" "order by" order-by)
                                                    ""))
                                           (if (list? limit) 
-                                              (sprintf "~A ~A " "limit" (string-join limit ","))
+                                              (sprintf "~A ~A" "limit" (string-join limit ","))
                                               (if (and (string? limit)
                                                        (> (string-length limit) 0))
-                                                  (sprintf "~A ~A " "limit" limit)
+                                                  (sprintf "~A ~A" "limit" limit)
                                                   "")))))
                             
                     (define (construct-ins-query)
@@ -470,7 +471,7 @@
                                                      (sprintf "Invalid Query Syntax: `create-tmp` clause expects a string or symbol ~A "
                                                               "defining name of table name")))))
                                   (set! exp (cdr exp))
-                                  (sprintf "~A ~A ~A " "create temporary table" table-name (construct-sel-query))))
+                                  (sprintf "~A ~A ~A" "create temporary table" table-name (construct-sel-query))))
                             
                     
                     (define (process-param #!key current-command ;list of command currently being processed it's abbreviations
