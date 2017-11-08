@@ -4,7 +4,7 @@ A Macro to Write Select/Update/Delete/Insert/Create Temp Table MySQL queries dir
 
 to include : (include "scql.scm")
 
-Examples:
+# select
 
 (scql sel col fr tab)
 
@@ -48,18 +48,30 @@ Examples:
 
 "select col1,col2,col3,col4,(select SUM(tab2.aggregated_number) from tab2 where tab2.id=tab1.tab2_id limit 1 )as aggregated_number from tab1 where aggregated_number>100"
 
+# insert select
+
 (scql sel (col1 col2 col3 col4) fr tab1 lim (10 100) ins (tab2 col1 col2 col3 col4))
 
 "insert into tab2 (col1,col2,col3,col4) select col1,col2,col3,col4 from tab1 limit 10,100 "
 
+# update
 (scql upd (table col1 val1 col2 val2 col3 val3) wh (>= table.id 10 and = table.include 1))
 
 "update table set col1=val1,col2=val2,col3=val3 where table.id>=10 and table.include=1"
+
+# delete
 
 (scql del fr table wh (= id 10))
 
 "delete from table where id=10"
 
+# insert
+
 (scql ins (table col1 val1 col2 val2 col3 val3))
 
 "insert into table (col1,col2,col3) values (val1,val2,val3)"
+
+# create temp table
+(scql cr-tmp tmp-table (col1 col2 col3 col4) fr tbl1 jo (left tbl2) on ( (= tbl1.id tbl2.id and > tbl1.value 1000)))
+
+"create temporary table tmp-table   select col1,col2,col3,col4 from tbl1 left join tbl2  on tbl1.id = tbl2.id  and tbl1.value > 1000  ;  "
