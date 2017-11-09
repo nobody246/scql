@@ -45,14 +45,13 @@
                               (let ((evaluated-child (eval `(condition-case ((lambda() ,x)) [(exn) #f]))))
                                    (if (equal? evaluated-child evaluated-parent)
                                        (let ((x (symbol->string x)))
-                                            (throw-exception 
-                                              (sprintf "~A ~A ~A ~A ~A ~A ~A "
-                                                       "Invalid Query Syntax: A circular reference was detected."
-                                                       "The scheme list named `" x "` contains a reference to itself."
-                                                       "If you meant to define the literal \"" x 
-                                                       "\", enclose it in quotes."))))))
-                                     evaluated-parent)
-                                 (set! v (map parse-symbol evaluated-parent)))) ;we got passed the errors, process list
+                                         (throw-exception 
+                                           (sprintf "Invalid Query Syntax: A circular reference was detected. ~A ~A ~A ~A ~A ~A "
+                                                    "The scheme list named `" x "` contains a reference to itself."
+                                                    "If you meant to define the literal \"" x 
+                                                    "\", enclose it in quotes."))))))
+                              evaluated-parent)
+                          (set! v (map parse-symbol evaluated-parent)))) ;we got passed the errors, process list
                    ((list? v) ;literal list
                     (if (eq? (car v) 'quote)
                         (set! v (parse-symbol (car (cdr v))))
@@ -115,9 +114,8 @@
               (if (not (= (remainder (- (length clause) 3) 4) 0))
                   (throw-exception 
                     (sprintf 
-                      "~A ~A ~A ~A ~A "
-                      "Invalid `" type 
-                      "` clause list passed, first clause requires 3 elements (<operator> <col> <val> [...]),"
+                      "Invalid ~A ~A ~A ~A"
+                      type "` clause list passed, first clause requires 3 elements (<operator> <col> <val> [...]),"
                       "Subsequent additions to that clause require 4 elements (<logical operator and/or/etc.>"
                       "<operator> <col> <val> [...])"))))
              (if (or (and first (>= (length clause) 3))
