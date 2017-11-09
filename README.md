@@ -116,7 +116,8 @@ will evaluate to
 
 **"select print,non-procedure-symbol-name from list,something-or-another;"**.
 
-
+# TODO
+I am repeating myself a little too much in the code, I will refactor and automate parts of the query generation, particularly all the strings of error messages mapped to process-param in the procedures that make the queries.
 
 
 
