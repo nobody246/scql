@@ -5,8 +5,8 @@ A Macro to Write Select/Update/Delete/Insert/Create Temp Table MySQL queries dir
 I'm **not** necessarily recommending anybody actually use it, it's still rough.It's simply an exercise in learning what I can do with macros. Keep in mind most of this has not been tested against anything aside from my memory of SQL.
 
 # syntax abbreviations
-select, from , join, where, having, group-by , order-by, limit, insert commands can respectively be abbreviated to
-sel, fr, jo, wh, ha, gr-by or-by, lim, ins
+select, from , join, where, having, group-by , order-by, limit, insert, delete commands can respectively be abbreviated to
+sel, fr, jo, wh, ha, gr-by or-by, lim, ins, del
 
 
 # to use
