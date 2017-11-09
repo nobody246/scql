@@ -1,6 +1,6 @@
 # scql
 
-A Macro to Write Select/Update/Delete/Insert/Create Temp Table MySQL queries directly in Chicken Scheme. It allows me to write the SQL queries I most often use in a quick fashion, without losing syntax highlighting and with compile time checking of missing or malformed clauses. Only parameterized queries will work, as SQL strings are generated at compilation.
+A Macro to Write Select/Update/Delete/Insert/Create Temp Table MySQL queries directly in syntax. It allows me to write the SQL queries I most often use in a quick fashion, without losing syntax highlighting and with compile time checking of missing or malformed clauses. Only parameterized queries will work, as SQL strings are generated at compilation.
 
 I'm **not** necessarily recommending anybody actually use it, it's still rough.It's simply an exercise in learning what I can do with macros. Keep in mind most of this has not been tested against anything aside from my memory of SQL.
 
@@ -109,6 +109,6 @@ will evaluate to **"select print,non-procedure-symbol-name from list,something-o
 
 
 
-
+Tested on Chicken-scheme and uses "extras, srfi-1 and srfi-13"
 
 
