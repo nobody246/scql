@@ -105,7 +105,9 @@ will evaluate to
 
 **"select print from list;"**,
 
-**but**
+but
+
+
 **(define x '(print non-procedure-symbol-name))**
 **(define y '(list something-or-another))**
 **(scql sel x from y)**
