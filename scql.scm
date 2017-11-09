@@ -95,9 +95,8 @@
                                p-str)))
                    (define (p-j join-list p-str)
                      (if (>= (length join-list) 2)
-                         (begin (set! p-str (sprintf "~A ~A ~A ~A ~A" 
-                                                     p-str (car join-list) 
-                                                     "join" (cadr join-list) (p-o (car on) "")))
+                         (begin (set! p-str (sprintf "~A ~A join ~A ~A" 
+                                                     p-str (car join-list) (cadr join-list) (p-o (car on) "")))
                                 (set! on (cdr on))
                                 (p-j (cddr join-list) p-str))
                                 p-str))
