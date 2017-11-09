@@ -109,6 +109,6 @@ will evaluate to **"select print,non-procedure-symbol-name from list,something-o
 
 
 
-Tested on Chicken-scheme and uses "extras, srfi-1 and srfi-13"
+Tested on Chicken-scheme and depends on "extras, srfi-1 and srfi-13"
 
 
