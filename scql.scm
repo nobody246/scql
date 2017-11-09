@@ -535,8 +535,8 @@
                                  (if (not (fold (lambda (new old) 
                                                   (set! new (eval `(begin ,new)))
                                                   (or old (new b)))
-                                                  #f
-                                                  return-checks)) ;run all the return checks
+                                                #f
+                                                return-checks)) ;run all the return checks
                                      (throw-exception return-check-error))
                                  ;check that the next command is within 
                                  (define exp-len (length exp))
