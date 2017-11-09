@@ -1,6 +1,6 @@
 # scql
 
-A Macro to Write Select/Update/Delete/Insert/Create Temp Table MySQL queries directly in syntax while writing applications in Chicken Scheme. It allows me to write the SQL queries I most often use in shorthand, without losing syntax highlighting and with compile time checking of missing or malformed clauses. Works for generating parameterized queries and queries with known values during compilation time. **Depends on extras, srfi-1 and srfi-13.**
+A Macro to Write Select/Update/Delete/Insert/Create Temp Table MySQL queries directly in syntax while writing applications in Chicken Scheme. It allows me to write the SQL queries I most often use in shorthand, without losing syntax highlighting and with compile time checking of missing or malformed clauses. Works for generating parameterized queries as well as any type of queries having known values during compilation time. **Depends on extras, srfi-1 and srfi-13.**
 
 I'm **not** necessarily recommending anybody actually use it, it's still rough.It's simply an exercise in learning what I can do with macros. Keep in mind most of this has not been tested against anything aside from my memory of SQL.
 
