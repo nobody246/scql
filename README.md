@@ -99,7 +99,7 @@ sel, fr, jo, wh, ha, gr-by or-by, lim, ins
 
 **Also to note:**
 You can pass lists, strings, or numbers where applicable, literally or as variables. Procedures passed in scql clause will reference the symbol of that procedure's name and eventually convert to a string E.g, 
-**(scql sel print from list)** will evaluate to **"select print from list;"**.
+**(scql sel print from list)** will evaluate to **"select print from list;"**,
 
 **but
 (define x '(print non-procedure-symbol-name))
