@@ -31,7 +31,7 @@ sel, fr, jo, wh, ha, gr-by or-by, lim, ins, del
 
 "select col1 from tab1 where tab1.id = ?;"
 
-**(scql sel col1 fr tab1 wh (= tab1.id 10 and > tab1.number ?)) **
+**(scql sel col1 fr tab1 wh (= tab1.id 10 and > tab1.number ?))**
 
 "select col1 from tab1  where tab1.id = 10 and tab1.number > ?;"
 
@@ -47,19 +47,19 @@ sel, fr, jo, wh, ha, gr-by or-by, lim, ins, del
 
 "select tab1.id,tab1.col1,tab2.id from tab1 left join tab2  on tab2.tab1_id = tab1.id and tab2.number > tab1.number right join tab3  on tab3.tab2_id = tab2_id  where tab3.id = ? and tab2.number > 100 group by tab1.fname,tab2.id_number order by   tab1.lname asc  limit 1,10000 ;"
 
-**(define _cols "col4 as num, col5") **
+**(define _cols "col4 as num, col5")**
 
 **(scql sel _cols fr table)**
 
 "select col4 as num, col5 from table;"
 
-**(define _tabs '(tab1 tab2 tab3 tab4 tab5)) **
+**(define _tabs '(tab1 tab2 tab3 tab4 tab5))**
 
 **(scql sel col fr _tabs)**
 
 "select col from tab1,tab2,tab3,tab4,tab5;"
 
-**(define sub-query1 (scql ->sel "SUM(tab2.aggregated_number)" fr tab2 wh (= tab2.id tab1.tab2_id) lim 1 as aggregated_number)) **
+**(define sub-query1 (scql ->sel "SUM(tab2.aggregated_number)" fr tab2 wh (= tab2.id tab1.tab2_id) lim 1 as aggregated_number))**
 
 **(scql sel (col1 col2 col3 col4 sub-query1) fr tab1 wh (> aggregated_number 100))**
 
@@ -99,13 +99,20 @@ sel, fr, jo, wh, ha, gr-by or-by, lim, ins, del
 
 **Also to note:**
 You can pass lists, strings, or numbers where applicable, literally or as variables. Procedures passed in scql clause will reference the symbol of that procedure's name and eventually convert to a string E.g, 
-**(scql sel print from list)** will evaluate to **"select print from list;"**,
+**(scql sel print from list)** 
+
+will evaluate to 
+
+**"select print from list;"**,
 
 **but**
 **(define x '(print non-procedure-symbol-name))**
 **(define y '(list something-or-another))**
 **(scql sel x from y)**
-will evaluate to **"select print,non-procedure-symbol-name from list,something-or-another;"**.
+
+will evaluate to 
+
+**"select print,non-procedure-symbol-name from list,something-or-another;"**.
 
 
 
