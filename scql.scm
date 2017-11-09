@@ -198,31 +198,36 @@
                     '('(from fr) ;select clause
                       '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins) '() 
                       '(list? string?)
-                      "Invalid Query Syntax: Expected one or more: `join`,`group-by`,`where`, `having`, `limit`, `order-by`, `insert` clauses."
+                      (sprintf "Invalid Query Syntax: Expected one or more: `join`,`group-by`,`where`, ~A"
+                               "`having`, `limit`, `order-by`, `insert` clauses.")
                       "Invalid Query Syntax: List or string expected in `From` clause.")
-                    '('(join jo) '(on) '()  ; join clause
+                    '('(join jo) '(on) '(from)  ; join clause
                       '(list?)
-                      "Invalid Query Syntax: Expected`on` clause"
+                      "Invalid Query Syntax: Expected`on` clause after `join` clause, preceded by `from` clause"
                       "Invalid Query Syntax: List expected in `join` clause.")
                     '('(on) ;on clause
                       '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins)  '(join)
                       '(list?)
-                      "Invalid Query Syntax: Expected one or more of: Group-by Where, Having, Limit, Insert Clauses, not found."
+                      (sprintf "Invalid Query Syntax: Expected one or more of: Group-by Where, Having, Limit, ~A" 
+                               "Insert Clauses, not found.")
                       "Invalid Query Syntax: List expected in `on` clause.")
                     '('(where wh) ;where clause
                       '(as group-by gr-by having ha limit lim order-by or-by insert ins)  '() 
                       '(list? string?) 
-                      "Invalid Query Syntax: Expected one or more: `group-by`, `having`, `limit`, `order-by`, `insert` following `where` clauses."
+                      (sprintf  "Invalid Query Syntax: Expected one or more: `group-by`, `having`, `limit`, ~A" 
+                                "`order-by`,`insert` following `where` clauses.")
                       "Invalid Query Syntax: List expected in `having` clause.")
                     '('(group-by gr-by)
                       '(as having ha limit lim order-by or-by insert ins) '() 
                       '(list? string?)
-                      "Invalid Query Syntax: Expected one or more: `limit`, `order-by`, `insert` clauses following `group-by` clause."
+                      (sprintf "Invalid Query Syntax: Expected one or more: `limit`, `order-by`, `insert` ~A" 
+                               "clauses following `group-by` clause.")
                       "Invalid Query Syntax: List, string, or symbol expected as argument to `group-by` clause.")
                     '('(having ha)
                       '(as group-by gr-by limit lim order-by or-by insert ins) '() 
                       '(list? string?)
-                      "Invalid Query Syntax: Expected one or more: `group-by`, `limit`, `order-by`, `insert` clauses following `having` clause."
+                      (sprintf "Invalid Query Syntax: Expected one or more: `group-by`, `limit`, `order-by`, ~A" 
+                               "`insert` clauses following `having` clause.")
                       "Invalid Query Syntax: List expected in `having` clause.")
                     '('(order-by or-by)
                       '(limit lim insert ins) '() 
