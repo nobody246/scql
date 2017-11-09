@@ -113,8 +113,8 @@
               (if (not (= (remainder (- (length clause) 3) 4) 0))
                   (throw-exception 
                     (sprintf 
-                      "Invalid ~A ~A ~A ~A"
-                      type "` clause list passed, first clause requires 3 elements (<operator> <col> <val> [...]),"
+                      "Invalid `~A` ~A ~A ~A"
+                      type " clause list passed, first clause requires 3 elements (<operator> <col> <val> [...]),"
                       "Subsequent additions to that clause require 4 elements (<logical operator and/or/etc.>"
                       "<operator> <col> <val> [...])"))))
              (if (or (and first (>= (length clause) 3))
