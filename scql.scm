@@ -349,12 +349,14 @@
                     '('(where wh) ;where clause
                       '(having ha limit lim order-by or-by)  '() 
                       '(list? string?) 
-                      "Invalid Query Syntax: Expected one or more: `having`, `limit`, `order-by`, `insert` following `where` clauses."
+                      (sprintf "Invalid Query Syntax: Expected one or more: `having`, `limit`, `order-by`, `insert` ~A"
+                               "following `where` clauses.")
                       "Invalid Query Syntax: List expected in `having` clause.")
                     '('(having ha)
                       '(limit lim order-by or-by) '() 
                       '(list? string?)
-                      "Invalid Query Syntax: Expected one or more:  `limit`, `order-by`, `insert` clauses following `having` clause."
+                      (sprintf "Invalid Query Syntax: Expected one or more:  `limit`, `order-by`, `insert` clauses ~A"
+                               "following `having` clause.")
                       "Invalid Query Syntax: List expected in `having` clause.")
                      '('(order-by or-by)
                        '(limit lim) '() 
