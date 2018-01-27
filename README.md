@@ -1,8 +1,6 @@
 # scql
 
-A Macro to Write Select/Update/Delete/Insert/Create Temp Table MySQL queries directly in syntax while writing applications in Chicken Scheme. It allows me to write the SQL queries I most often use in shorthand, without losing syntax highlighting and with compile time checking of missing or malformed clauses. Works for generating parameterized queries as well as any type of queries having known values during compilation time. **Depends on extras, srfi-1 and srfi-13.**
-
-I'm **not** necessarily recommending anybody actually use it, it's still rough.It's simply an exercise in learning what I can do with macros. Keep in mind most of this has not been tested against anything aside from my memory of SQL.
+I wrote this to check out what I can do with macros, and write MySQL queries in scheme, and also before I heard about ssql (http://wiki.call-cc.org/eggref/4/ssql), which does something similar and is most likely better tested than this.
 
 # syntax abbreviations
 select, from , join, where, having, group-by , order-by, limit, insert, delete commands can respectively be abbreviated to
@@ -115,10 +113,6 @@ but
 will evaluate to 
 
 **"select print,non-procedure-symbol-name from list,something-or-another;"**.
-
-# TODO
-I am repeating myself a little too much in the code, I will refactor and automate parts of the query generation, particularly all the strings of error messages mapped to process-param in the procedures that generate the queries.
-
 
 
 
