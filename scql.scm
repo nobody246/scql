@@ -455,46 +455,46 @@
                             (sprintf "Invalid Query Syntax: Argument to `~A` clause not found. "
                                      (symbol->string command-title))))
                       (let ((b (parse-symbol (car (cdr exp))))) ;get argument coming after command
-                           (set! exp (cddr exp))
-                           (if (not (fold 
-                                      (lambda (new old) 
-                                        (set! new (eval `(begin ,new)))
-                                        (or old (new b)))
-                                      #f
-                                      return-checks)) ;run all the return checks
-                               (throw-exception 
-                                 (sprintf 
-                                   "~A ~A ~A ~A"
-                                   "Invalid Query Syntax: Argument to "
-                                   "failed to meet one of the following required type checks: "
-                                   (car current-command)
-                                   (string-join (map symbol->string return-checks) ","))))
+                        (set! exp (cddr exp))
+                        (if (not (fold 
+                                   (lambda (new old) 
+                                     (set! new (eval `(begin ,new)))
+                                     (or old (new b)))
+                                   #f
+                                   return-checks)) ;run all the return checks
+                            (throw-exception 
+                              (sprintf 
+                                "~A ~A ~A ~A"
+                                "Invalid Query Syntax: Argument to "
+                                "failed to meet one of the following required type checks: "
+                                (car current-command)
+                                (string-join (map symbol->string return-checks) ","))))
                         ;check that the next command is expected 
                         (define exp-len (length exp))
                         (if 
                           (> exp-len 1)
                           (let ((a  (string-downcase (parse-symbol (car exp)))))
-                               (if (>= exp-len 2)
-                                   (if (not (and (or (eq? allowed-last-commands '())
-                                                     (member last-command allowed-last-commands))
-                                                 (fold (lambda (new old) 
-                                                         (or old (and (eq? new (string->symbol a)))))
-                                                       #f
-                                                       allowed-next-commands)))
-                                       (throw-exception 
-                                         (sprintf 
-                                           "~A ~A ~A ~A ~A"
-                                           "Invalid Query Syntax: Expected one of the following:"
-                                           (string-join (map symbol->string allowed-next-commands) ",")
-                                           "After"
-                                           (car current-command)
-                                           (if (> (length allowed-last-commands) 0)
-                                               (sprintf 
-                                                 " And one of the following: ~A preceding ~A."
-                                                 (string-join (map symbol->string allowed-last-commands) ",")
-                                                 (car current-command))
-                                               ".")))))
-                               (set! last-command command-title)))
+                            (if (>= exp-len 2)
+                                (if (not (and (or (eq? allowed-last-commands '())
+                                                  (member last-command allowed-last-commands))
+                                              (fold (lambda (new old) 
+                                                      (or old (and (eq? new (string->symbol a)))))
+                                                    #f
+                                                    allowed-next-commands)))
+                                    (throw-exception 
+                                      (sprintf 
+                                        "~A ~A ~A ~A ~A"
+                                        "Invalid Query Syntax: Expected one of the following:"
+                                        (string-join (map symbol->string allowed-next-commands) ",")
+                                        "After"
+                                        (car current-command)
+                                        (if (> (length allowed-last-commands) 0)
+                                            (sprintf 
+                                              " And one of the following: ~A preceding ~A."
+                                              (string-join (map symbol->string allowed-last-commands) ",")
+                                              (car current-command))
+                                            ".")))))
+                            (set! last-command command-title)))
                         b)))
                   (set! a #f))
               a)
