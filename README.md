@@ -1,6 +1,6 @@
 # scql
 
-I wrote this to check out what I can do with macros, and write MySQL queries in scheme, and also before I heard about ssql (http://wiki.call-cc.org/eggref/4/ssql), which does something similar and is most likely better tested than this.
+I wrote this to check out what I can do with macros, and write MySQL queries in Chicken Scheme. This was before I heard about ssql (http://wiki.call-cc.org/eggref/4/ssql), which (**I think**) does something similar and is most likely better tested and better written than this (Not really sure either way, but I wouldn't use scql for anything too serious, I'm just playing around a bit).
 
 # syntax abbreviations
 select, from , join, where, having, group-by , order-by, limit, insert, delete commands can respectively be abbreviated to
