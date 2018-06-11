@@ -70,52 +70,81 @@
 		 (throw-exception 
 		  (sprintf "Invalid Query Syntax: Value ~A is not of an expected type." v)))))
 	   v))
+       (define command-tree '())
+       (define (descend-command-tree #!key
+				     (required-previous-command `())
+				     (override-current-command `())
+				     (override-command-tree `())
+				     (use-null-command-tree #f))
+	 (let* ((c (if use-null-command-tree
+		       '()
+		       (if (= (length override-command-tree) 0)
+			   command-tree
+			   override-command-tree)))
+		(c (if override-current-command
+		       (append override-current-command c)
+		       c)))
+	   (if (> (length c) 2)
+	       (begin
+		 (if (and
+		      (not use-null-command-tree)
+		      (eq? override-command-tree '()))
+		     (set! command-tree (cddr command-tree))
+		     (void))
+		 `((,(car c) ,(cadr c))
+		   ,(cddr c)
+		   ,required-previous-command))
+	       `((,(car c) ,(cadr c))
+		 ()
+		 ,required-previous-command))))
        (define (process-join join on)
 	 (let 
 	     ((processed-str ""))
-	   (if (and  
-                (list? join)
-                (list? on)
-                (= (* (length on) 2)
-                   (length join)))
-	       (begin
-		 (define (p-o on-list p-str)
-		   (let 
-		       ((first (equal? p-str "")))
-		     (if first 
-			 (if 
-                          (not (= (remainder (- (length on-list) 3) 4) 0))
-                          (throw-exception 
-			   (sprintf 
-			    "Invalid on clause list passed, first clause requires 3 elements ~A ~A"
-			    "(<operator> <col> <val>[...]), Subsequent additions to that clause require"
-			    "4 elements (<logical operator and/or/etc.> <operator> <col> <val> [...])"))))
-		     (if (>= (length on-list) (if first 3 4))
-			 (begin 
-			   (set! p-str 
-			     (sprintf 
-			      "~A ~A ~A ~A ~A"
-			      p-str 
-			      (if first "on" (car on-list)) 
-			      (if first (cadr on-list) (caddr on-list)) 
-			      (if first (car on-list) (cadr on-list))
-			      (if first (caddr on-list) (cadddr on-list))))
-			   (p-o ((if first cdddr cddddr) on-list) p-str))
-			 p-str)))
-		 (define (p-j join-list p-str)
-		   (if (>= (length join-list) 2)
-		       (begin 
-			 (set! p-str 
-			   (sprintf 
-                            "~A ~A join ~A ~A" 
-                            p-str (car join-list) (cadr join-list) (p-o (car on) "")))
-			 (set! on (cdr on))
-			 (p-j (cddr join-list) p-str))
-		       p-str))
-		 (p-j join ""))
-	       (throw-exception 
-                (sprintf "Invalid Query Syntax: You must pass join clause as list, and on clause ~A"
-			 "as nested list with one entry per join clause defining the terms of the join.")))))
+	   (if
+	    (and  
+	     (list? join)
+	     (list? on)
+	     (= (* (length on) 2)
+		(length join)))
+	    (begin
+	      (define (p-o on-list p-str)
+		(let 
+		    ((first (equal? p-str "")))
+		  (if
+		   first 
+		   (if 
+		    (not (= (remainder (- (length on-list) 3) 4) 0))
+		    (throw-exception 
+		     (sprintf 
+		      "Invalid on clause list passed, first clause requires 3 elements ~A ~A"
+		      "(<operator> <col> <val>[...]), Subsequent additions to that clause require"
+		      "4 elements (<logical operator and/or/etc.> <operator> <col> <val> [...])"))))
+		  (if (>= (length on-list) (if first 3 4))
+		      (begin 
+			(set! p-str 
+			  (sprintf 
+			   "~A ~A ~A ~A ~A"
+			   p-str 
+			   (if first "on" (car on-list)) 
+			   (if first (cadr on-list) (caddr on-list)) 
+			   (if first (car on-list) (cadr on-list))
+			   (if first (caddr on-list) (cadddr on-list))))
+			(p-o ((if first cdddr cddddr) on-list) p-str))
+		      p-str)))
+	      (define (p-j join-list p-str)
+		(if (>= (length join-list) 2)
+		    (begin 
+		      (set! p-str 
+			(sprintf 
+			 "~A ~A join ~A ~A" 
+			 p-str (car join-list) (cadr join-list) (p-o (car on) "")))
+		      (set! on (cdr on))
+		      (p-j (cddr join-list) p-str))
+		    p-str))
+	      (p-j join ""))
+	    (throw-exception 
+	     (sprintf "Invalid Query Syntax: You must pass join clause as list, and on clause ~A"
+		      "as nested list with one entry per join clause defining the terms of the join.")))))
        (define (process-clause type clause processed-str)
 	 (let 
 	     ((first (equal? processed-str ""))
@@ -176,42 +205,97 @@
 		   (sprintf "set ~A" processed-str)
 		   processed-str))))
        (define (construct-sel-query)
+	 (set! command-tree
+	   '(from fr as as join jo group-by
+		  gr-by where wh having ha
+		  limit lim order-by or-by
+		  insert ins))
 	 (let* 
 	     ((nested (or (eq? top-command  '->sel)
 			  (eq? top-command  '->select)))
 	      (cols   
 	       (begin 
 		 (if (<= (length exp) 1)
-		     (throw-exception "Invalid Query Syntax: column(s) definition is required."))
+		     (throw-exception
+		      "Invalid Query Syntax: column(s) definition is required."))
 		 (let 
 		     ((a (parse-symbol (car exp))))
-		   (if (not (or (list? a) (string? a)))
-		       (throw-exception 
-                        "Invalid Query Syntax: column(s) definition is of an invalid type."))
-		   (if (>= (length exp) 1)
-		       (set! exp (cdr exp))
-		       (throw-exception 
-                        "Invalid Query Syntax: `From` clause expected after column(s) definition."))
+		   (if
+		    (not (or (list? a) (string? a)))
+		    (throw-exception 
+		     "Invalid Query Syntax: column(s) definition is of an invalid type."))
+		   (if
+		    (>= (length exp) 1)
+		    (set! exp (cdr exp))
+		    (throw-exception 
+		     "Invalid Query Syntax: `From` clause expected after column(s) definition."))
 		   a)))
 	      (processed-results 
 	       (map 
                 (lambda (args)
-                  (process-param current-command:       (car (cdr (car args)))
-                                 allowed-next-commands: (car (cdr (cadr args)))
-                                 allowed-last-commands: (car (cdr (caddr args)))
-                                 return-checks:         (car (cdr (cadddr args)))))
-                (list 
-		 '('(from fr) '(as join jo group-by gr-by where wh having ha limit lim order-by or-by insert ins) '() 
-		   '(list? string?))
-		 '('(join jo) '(on) '(from) '(list?)) 
-		 '('(on) '(as group-by gr-by where wh having ha limit lim order-by or-by insert ins)  '(join) '(list?))
-		 '('(where wh) '(as group-by gr-by having ha limit lim order-by or-by insert ins)  '() '(list? string?))
-		 '('(group-by gr-by) '(as having ha limit lim order-by or-by insert ins) '() '(list? string?))
-		 '('(having ha) '(as group-by gr-by limit lim order-by or-by insert ins) '() '(list? string?))
-		 '('(order-by or-by) '(limit lim insert ins) '() '(list? string?))
-		 '('(limit lim) '(as insert ins) '() '(list? string?))
-		 '('(as) '(insert ins)  '() '(string?) '())
-		 '('(insert ins) '()  '() '(list? string?) '()))))
+		  (print "??" args)
+                  (process-param current-command:       (car args)
+                                 allowed-next-commands: (cadr args)
+                                 allowed-last-commands: (caddr args)
+                                 return-checks:         (cadddr args)))
+                `((,@(descend-command-tree) 
+		   (list? string?))
+		  (,@(descend-command-tree required-previous-command: '(from)
+					   override-command-tree: '(join jo on))
+		   (list?)) 
+		  (,@(descend-command-tree
+		      required-previous-command: '(join)
+		      override-current-command: '(on on)
+		      override-command-tree:
+		      '(as group-by gr-by
+			   where wh
+			   having ha
+			   limit lim
+			   order-by or-by
+			   insert ins))
+		   (list?))
+		  (,@(descend-command-tree
+		      override-current-command: '(where wh)
+		      override-command-tree:
+		      '(as group-by gr-by
+			   having ha
+			   limit lim
+			   order-by or-by
+			   insert ins))
+		   (list? string?))
+		  (,@(descend-command-tree
+		      override-current-command: '(group-by gr-by)
+		      override-command-tree:
+		      '(as having ha
+			   limit lim
+			   order-by
+			   or-by
+			   insert ins))
+		   (list? string?))
+		  (,@(descend-command-tree
+		      override-current-command: '(having ha)
+		      override-command-tree:
+		      '(as group-by gr-by
+			   limit lim
+			   order-by or-by
+			   insert ins))
+		   (list? string?))
+		  (,@(descend-command-tree
+		      override-current-command: '(order-by or-by)
+		      override-command-tree: '(limit lim insert ins))
+		   (list? string?))
+		  (,@(descend-command-tree
+		      override-current-command: '(limit lim)
+		      override-command-tree: '(as insert ins))
+		   (list? string?))
+		  (,@(descend-command-tree
+		      override-current-command: '(as as)
+		      override-command-tree: '(insert ins))
+		   (string?))
+		  (,@(descend-command-tree
+		      override-current-command: '(insert ins)
+		      use-null-command-tree: #t)
+		   (list? string?)))))
 	      (tables (car processed-results))
 	      (join (cadr processed-results))
 	      (on  (caddr processed-results))
@@ -257,10 +341,10 @@
 		(process-clause 'having having-clause "")
 		(if (and (string? having-clause)
 			 (> (string-length having-clause) 0))
-		    (sprintf "~A ~A" "having" having-clause)
+		    (sprintf " ~A ~A " "having" having-clause)
 		    ""))
 	    (if (list? order-by) 
-		(sprintf "~A ~A" "order by" (process-order-by order-by ""))
+		(sprintf " ~A ~A " "order by" (process-order-by order-by ""))
 		(if (and (string? order-by) (> (string-length order-by) 0))
 		    (sprintf " ~A ~A " "order by" order-by) ""))
 	    (if (list? limit) 
@@ -279,21 +363,32 @@
 			      "select query (use `->sel` or `->select`)"))
 		    ";")))))
        (define (construct-upd-query)
+	 (set! command-tree
+	   '(where wh
+		   having ha
+		   limit lim
+		   order-by or-by))
 	 (let* 
 	     ((vals  
 	       (begin 
-		 (if (< (length exp) 1)
-		     (throw-exception "Invalid Query Syntax: Values definition is required."))
+		 (if
+		  (< (length exp) 1)
+		  (throw-exception
+		   "Invalid Query Syntax: Values definition is required."))
 		 (let 
 		     ((a (parse-symbol (car exp))))
-		   (if (not (or (list? a) (string? a)))
-		       (throw-exception "Invalid Query Syntax: Values definition is of an invalid type.")
-		       (if (and (list? a)
-				(not (even? (sub1 (length a)))))
-			   (throw-exception (sprintf "Invalid Query Syntax: Values definition elements ~A ~A ~A "
-						     "following first element which is table"
-						     "definition must be a list of even length with each 2"
-						     "values representing a column/value pair."))))
+		   (if
+		    (not (or (list? a) (string? a)))
+		    (throw-exception
+		     "Invalid Query Syntax: Values definition is of an invalid type.")
+		    (if
+		     (and (list? a)
+			  (not (even? (sub1 (length a)))))
+		     (throw-exception
+		      (sprintf "Invalid Query Syntax: Values definition elements ~A ~A ~A "
+			       "following first element which is table"
+			       "definition must be a list of even length with each 2"
+			       "values representing a column/value pair."))))
 		   (if (>= (length exp) 1)
 		       (set! exp (cdr exp))
 		       (throw-exception "Invalid Query Syntax: Values definition expected after table definition."))
@@ -301,65 +396,80 @@
 	      (processed-results 
 	       (map 
 		(lambda (args)
-		  (process-param current-command: (car (cdr (car args)))
-				 allowed-next-commands: (car (cdr (cadr args)))
-				 allowed-last-commands: (car (cdr (caddr args)))
-				 return-checks: (car (cdr (cadddr args)))))
-		(list  
-                 '('(join jo) '(on) '() '(list?))
-                 '('(on) '(as where wh having ha limit lim order-by or-by insert ins) '(join) '(list?))
-                 '('(where wh) '(having ha limit lim order-by or-by)  '() '(list? string?))
-                 '('(having ha) '(limit lim order-by or-by) '() '(list? string?))
-                 '('(order-by or-by) '(limit lim) '() '(list? string?))
-                 '('(limit lim) '() '() '(list? string?)))))
+		  (print "??" args)
+		  (process-param current-command: (car args)
+				 allowed-next-commands: (cadr args)
+				 allowed-last-commands: (caddr args)
+				 return-checks: (cadddr args)))
+		`((,@(descend-command-tree
+		      override-current-command: '(join jo)
+		      override-command-tree: '(on))
+		   (list?))
+		  (,@(descend-command-tree
+		      override-current-command: '(on on)
+		      override-command-tree:
+		      '(as where wh having ha
+			   limit lim order-by
+			   or-by insert ins)
+		      required-previous-command: '(join))
+		   (list?))
+		  (,@(descend-command-tree)
+		   (list? string?))
+		  (,@(descend-command-tree)
+		   (list? string?))
+		  (,@(descend-command-tree)
+		   (list? string?))
+		  (,@(descend-command-tree)
+		   (list? string?)))))
 	      (join  (car processed-results))
 	      (on    (cadr processed-results))
 	      (where-clause (caddr processed-results))
 	      (having-clause (cadddr processed-results))
-	      (order-by (car (cddddr processed-results)))
-	      (limit    (cadr (cddddr processed-results))))
+	      (limit    (car (cddddr processed-results)))
+	      (order-by (cadr (cddddr processed-results))))
 	   (sprintf 
             "update ~A~A~A~A~A~A;"
             (if (string? vals)
                 vals
-                (sprintf "~A ~A" (car vals) (process-update-cols (cdr vals) "")))
+                (sprintf " ~A ~A " (car vals) (process-update-cols (cdr vals) "")))
             (if (and (list? join) (list? on))
                 (process-join join on)
                 "")
             (if (list? where-clause) 
                 (process-clause 'where where-clause "")
                 (if (and (string? where-clause) (> (string-length where-clause) 0))
-                    (sprintf "~A ~A" "where" where-clause)
+                    (sprintf " ~A ~A " "where" where-clause)
                     ""))
             (if (list? having-clause) 
                 (process-clause 'having having-clause "")
                 (if (and (string? having-clause) (> (string-length having-clause) 0))
-                    (sprintf "~A ~A" "having" having-clause)
+                    (sprintf " ~A ~A " "having" having-clause)
                     ""))
             (if (list? order-by) 
-                (sprintf "~A ~A" "order by" (process-order-by order-by ""))
+                (sprintf " ~A ~A " "order by" (process-order-by order-by ""))
                 (if (and (string? order-by) (> (string-length order-by) 0))
-                    (sprintf "~A ~A" "order by" order-by)
+                    (sprintf " ~A ~A " "order by" order-by)
                     ""))
             (if (list? limit) 
-                (sprintf "~A ~A " "limit" (string-join limit ","))
+                (sprintf " ~A ~A " "limit" (string-join limit ","))
                 (if (and (string? limit) (> (string-length limit) 0))
-                    (sprintf "~A ~A "  "limit" limit)
+                    (sprintf " ~A ~A "  "limit" limit)
                     "")))))
        (define (construct-del-query)
+	 (set! command-tree '(from fr where wh limit lim order-by or-by))
 	 (let* 
 	     ((processed-results 
 	       (map 
                 (lambda (args)
-                  (process-param current-command: (car (cdr (car args)))
-                                 allowed-next-commands: (car (cdr (cadr args)))
-                                 allowed-last-commands: (car (cdr (caddr args)))
-                                 return-checks: (car (cdr (cadddr args)))))
+                  (process-param current-command: (car args)
+                                 allowed-next-commands: (cadr args)
+                                 allowed-last-commands: (caddr args)
+                                 return-checks: (cadddr args)))
                 (list   
-		 '('(from fr) '(where wh limit lim order-by or-by) '() '(string?))
-		 '('(where wh) '(where wh limit lim order-by or-by)  '() '(list? string?))
-		 '('(order-by or-by) '(limit lim) '() '(list? string?))
-		 '('(limit lim) '() '() '(list? string?)))))
+		 `(,@(descend-command-tree) (string?))
+		 `(,@(descend-command-tree) (list? string?))
+		 `(,@(descend-command-tree) (list? string?))
+		 `(,@(descend-command-tree) (list? string?)))))
               (table         (car processed-results))
               (where-clause  (cadr processed-results))
               (order-by      (caddr processed-results))
