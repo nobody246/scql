@@ -233,7 +233,6 @@
 	      (processed-results 
 	       (map 
                 (lambda (args)
-		  (print "??" args)
                   (process-param current-command:       (car args)
                                  allowed-next-commands: (cadr args)
                                  allowed-last-commands: (caddr args)
@@ -396,7 +395,6 @@
 	      (processed-results 
 	       (map 
 		(lambda (args)
-		  (print "??" args)
 		  (process-param current-command: (car args)
 				 allowed-next-commands: (cadr args)
 				 allowed-last-commands: (caddr args)
@@ -465,33 +463,32 @@
                                  allowed-next-commands: (cadr args)
                                  allowed-last-commands: (caddr args)
                                  return-checks: (cadddr args)))
-                (list   
-		 `(,@(descend-command-tree) (string?))
-		 `(,@(descend-command-tree) (list? string?))
-		 `(,@(descend-command-tree) (list? string?))
-		 `(,@(descend-command-tree) (list? string?)))))
+                `((,@(descend-command-tree) (string?))
+		  (,@(descend-command-tree) (list? string?))
+		  (,@(descend-command-tree) (list? string?))
+		  (,@(descend-command-tree) (list? string?)))))
               (table         (car processed-results))
               (where-clause  (cadr processed-results))
-              (order-by      (caddr processed-results))
-              (limit         (cadddr processed-results)))
+              (limit         (caddr processed-results))
+	      (order-by      (cadddr processed-results)))
 	   (sprintf 
             "delete from ~A~A~A~A;"
             table
             (if (list? where-clause) 
                 (process-clause 'where where-clause "")
                 (if (and (string? where-clause) (> (string-length where-clause) 0))
-                    (sprintf "~A ~A" "where" where-clause)
+                    (sprintf " ~A ~A " "where" where-clause)
                     ""))
             (if (list? order-by) 
-                (sprintf "~A ~A" "order by" (process-order-by order-by ""))
+                (sprintf " ~A ~A " "order by" (process-order-by order-by ""))
                 (if (and (string? order-by) (> (string-length order-by) 0))
-                    (sprintf "~A ~A" "order by" order-by)
+                    (sprintf " ~A ~A " "order by" order-by)
                     ""))
             (if (list? limit) 
-                (sprintf "~A ~A" "limit" (string-join limit ","))
+                (sprintf " ~A ~A " "limit" (string-join limit ","))
                 (if (and (string? limit)
 			 (> (string-length limit) 0))
-                    (sprintf "~A ~A" "limit" limit)
+                    (sprintf " ~A ~A " "limit" limit)
                     "")))))
        (define (construct-ins-query)
 	 (let* 
