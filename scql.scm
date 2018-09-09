@@ -204,15 +204,14 @@
 	       (if (not first)
 		   (sprintf "set ~A" processed-str)
 		   processed-str))))
-       (define (construct-sel-query)
+       (define (construct-sel-query distinct)
 	 (set! command-tree
 	   '(from fr as as join jo group-by
 		  gr-by where wh having ha
 		  limit lim order-by or-by
 		  insert ins))
 	 (let* 
-	     ((nested (or (eq? top-command  '->sel)
-			  (eq? top-command  '->select)))
+	     ((nested (equal? (substring (symbol->string top-command) 0 2) "->"))
 	      (cols   
 	       (begin 
 		 (if (<= (length exp) 1)
@@ -306,7 +305,7 @@
 	      (as       (cadddr (cddddr (cdr processed-results))))
 	      (insert   (cadddr (cddddr (cddr processed-results)))))
 	   (sprintf 
-	    "~A~Aselect ~A from ~A~A~A~A~A~A~A~A~A" 
+	    "~A~Aselect ~A ~A from ~A~A~A~A~A~A~A~A~A"
 	    (if nested "(" "")
 	    (if (list? insert) 
 		(if (>= (length insert) 2)
@@ -320,6 +319,7 @@
 		(if (and (string? insert) (> (string-length insert) 0)) 
 		    (sprintf "~A ~A " "insert into" insert) 
 		    ""))
+            (if distinct "distinct" "")
 	    (if (list? cols) (string-join cols ",") cols)
 	    (if (list? tables) (string-join tables ",") tables)
 	    (if (and (list? join) (list? on)) (process-join join on) "")
@@ -612,7 +612,12 @@
 		  (eq? top-command 'select)
 		  (eq? top-command '->sel)
 		  (eq? top-command '->select))
-              (construct-sel-query))
+              (construct-sel-query #f))
+             ((or (eq? top-command 'sel-distinct)
+                  (eq? top-command 'select-distinct)
+                  (eq? top-command '->sel-distinct)
+                  (eq? top-command '->select-distinct))
+              (construct-sel-query #t))
 	     ((or (eq? top-command 'cr-tmp)
 		  (eq? top-command 'create-tmp))
               (construct-cre-tmp-query))
