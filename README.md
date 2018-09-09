@@ -115,7 +115,9 @@ will evaluate to
 **"select print,non-procedure-symbol-name from list,something-or-another;"**.
 
 
-#select distinct
+# select distinct
+
+
 **(scql sel-distinct (col1 (scql ->sel-distinct a fr b limit 1)) fr c)**
 
 
