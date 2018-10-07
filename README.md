@@ -94,6 +94,11 @@ sel-distinct ,sel, fr, jo, wh, ha, gr-by or-by, lim, ins, del
 "create temporary table tmp-table select col1,col2,col3,col4 from tbl1 left join tbl2  on tbl1.id = tbl2.id and tbl1.value > 1000;"
 
 
+# create temp table from distinct selection
+**(scql cr-tmp-distinct tmp-table (col1 col2 col3 col4) fr tbl1 jo (left tbl2) on ( (= tbl1.id tbl2.id and > tbl1.value 1000)))**
+
+"create temporary table tmp-table select distinct col1,col2,col3,col4 from tbl1 left join tbl2  on tbl1.id = tbl2.id and tbl1.value > 1000"
+
 
 **Also to note:**
 You can pass lists, strings, or numbers where applicable, literally or as variables. Procedures passed in scql clause will reference the symbol of that procedure's name and eventually convert to a string E.g, 
@@ -122,3 +127,13 @@ will evaluate to
 
 
 **"select distinct col1,(select distinct a from b limit 1 ) from c;"**
+
+# select as
+
+
+**(scql sel a fr b as c)**
+
+
+**"select  a from b as c "**
+
+
