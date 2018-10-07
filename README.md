@@ -100,26 +100,6 @@ sel-distinct ,sel, fr, jo, wh, ha, gr-by or-by, lim, ins, del
 "create temporary table tmp-table select distinct col1,col2,col3,col4 from tbl1 left join tbl2  on tbl1.id = tbl2.id and tbl1.value > 1000"
 
 
-**Also to note:**
-You can pass lists, strings, or numbers where applicable, literally or as variables. Procedures passed in scql clause will reference the symbol of that procedure's name and eventually convert to a string E.g, 
-**(scql sel print from list)** 
-
-will evaluate to 
-
-**"select print from list;"**,
-
-but
-
-
-**(define x '(print non-procedure-symbol-name))**
-**(define y '(list something-or-another))**
-**(scql sel x from y)**
-
-will evaluate to 
-
-**"select print,non-procedure-symbol-name from list,something-or-another;"**.
-
-
 # select distinct
 
 
@@ -137,3 +117,21 @@ will evaluate to
 **"select  a from b as c "**
 
 
+# **Things to note:**
+You can pass lists, strings, or numbers where applicable, literally or as variables. Procedures passed in scql clause will reference the symbol of that procedure's name and eventually convert to a string E.g, 
+**(scql sel print from list)** 
+
+will evaluate to 
+
+**"select print from list;"**,
+
+but
+
+
+**(define x '(print non-procedure-symbol-name))**
+**(define y '(list something-or-another))**
+**(scql sel x from y)**
+
+will evaluate to 
+
+**"select print,non-procedure-symbol-name from list,something-or-another;"**.
