@@ -351,16 +351,11 @@
 		(if (and (string? limit) (> (string-length limit) 0))
 		    (sprintf " ~A ~A " "limit" limit) ""))
 	    (if nested ")" "")
-	    (if (and nested (string? as))
-		(if (> (string-length as) 0)
-		    (sprintf " ~A ~A " "as" as)
-		    "")
-		(if (and (not (eq? as #f))
-			 (not (equal? as "")))
-		    (throw-exception 
-		     (sprintf "Invalid Query Syntax: `as` clause given to a non-nested ~A "
-			      "select query (use `->sel` or `->select`)"))
-		    ";")))))
+            (if (string? as)
+                (if (> (string-length as) 0)
+                    (sprintf " ~A ~A " "as" as)
+                    "")
+                ""))))
        (define (construct-upd-query)
 	 (set! command-tree
 	   '(where wh
@@ -524,7 +519,7 @@
                         (get-flds-and-vals (cddr pairs)))))
 	   (get-flds-and-vals pairs)
 	   (sprintf "~A values(~A);" (process-insert-cols (append (list table) flds)) (string-join vals ","))))
-       (define (construct-cre-tmp-query)
+       (define (construct-cre-tmp-query distinct)
 	 (let* ((table-name 
 		 (if (>= (length exp) 1)
 		     (parse-symbol (car exp))
@@ -532,7 +527,7 @@
                       (sprintf "Invalid Query Syntax: `create-tmp` clause expects a string or symbol ~A "
                                "defining name of table name")))))
 	   (set! exp (cdr exp))
-	   (sprintf "~A ~A ~A" "create temporary table" table-name (construct-sel-query))))
+	   (sprintf "~A ~A ~A" "create temporary table" table-name (construct-sel-query distinct))))
        
        (define (process-param #!key 
 			      current-command ;list of command currently being processed it's abbreviations
@@ -620,7 +615,10 @@
               (construct-sel-query #t))
 	     ((or (eq? top-command 'cr-tmp)
 		  (eq? top-command 'create-tmp))
-              (construct-cre-tmp-query))
+              (construct-cre-tmp-query #f))
+     	     ((or (eq? top-command 'cr-tmp-distinct)
+		  (eq? top-command 'create-tmp-with-distinct-rows))
+              (construct-cre-tmp-query #t))
 	     ((or (eq? top-command 'upd)
 		  (eq? top-command 'update))
               (construct-upd-query))
