@@ -1,6 +1,6 @@
 # scql
 
-I wrote this to check out what I can do with macros, and write MySQL queries in Chicken Scheme. This was before I heard about ssql (http://wiki.call-cc.org/eggref/4/ssql), which (**I think**) does something similar but I haven't tried it yet.
+I wrote this to check out what I can do with macros, and write MySQL queries as Chicken Scheme s-expressions so I get syntax highlighting and some extra compile time error checking.
 
 # syntax abbreviations
 select-distinct, select, from , join, where, having, group-by , order-by, limit, insert, delete commands can respectively be abbreviated to
