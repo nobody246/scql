@@ -627,4 +627,12 @@
               (construct-del-query))                          
 	     ((or (eq? top-command 'ins)
 		  (eq? top-command 'insert))
-              (construct-ins-query)))))))
+              (construct-ins-query))
+             (else
+              (throw-exception
+               (sprintf
+                "~A ~A ~A ~A"
+                "Error Unexpected top level command encountered, "
+                top-command
+                ".Expected select, select-distinct, create-tmp, update, delete or "
+                "insert, or their respective abbreviations."))))))))
