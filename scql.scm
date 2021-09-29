@@ -26,13 +26,11 @@
 				      [var () (string->symbol 
 					       (car (procedure-information ,v)))]))
 				  #f))
-	      (is-procedure (eq? procedure-name #t))
-	      (v (if is-procedure procedure-name v))
-	      (do-check is-defined )
-	      (is-number    (if do-check (eval `(number? ,v)) #f))
-	      (is-string    (if do-check (eval `(string? ,v)) #f))
-	      (is-list      (if do-check (eval `(list?  ,v)) #f))
-	      (is-symbol    (if do-check (eval `(symbol? ,v)) #f)))
+	      (v (if procedure-name procedure-name v))
+              (is-symbol    (if is-defined (eval `(symbol? ,v)) #f))
+              (is-number    (if (and (not is-symbol) is-defined) (eval `(number? ,v)) #f))
+              (is-string    (if (and (not is-number) is-defined) (eval `(string? ,v)) #f))
+              (is-list      (if (and (not is-string) is-defined) (eval `(list?  ,v)) #f)))
 	   (cond 
 	    (is-string
 	     (set! v (eval v)))
@@ -62,7 +60,7 @@
 	     (void)) ;just return v, catch the `cond` statement, so it doesnt go to else
 	    (is-number
 	     (set! v (number->string (eval v))))
-	    (is-procedure
+	    (procedure-name
 	     (set! v procedure-name))
 	    (else
 	     (if (symbol? v)
@@ -304,6 +302,11 @@
 	      (limit    (cadddr (cddddr processed-results)))
 	      (as       (cadddr (cddddr (cdr processed-results))))
 	      (insert   (cadddr (cddddr (cddr processed-results)))))
+           (if (not tables)
+               (throw-exception
+                (sprintf "~A ~A"
+                         "Invalid Query Syntax:"
+                         "`From` clause malformed.")))
 	   (sprintf 
 	    "~A~Aselect ~A ~A from ~A~A~A~A~A~A~A~A~A"
 	    (if nested "(" "")
@@ -421,7 +424,7 @@
 	      (limit    (car (cddddr processed-results)))
 	      (order-by (cadr (cddddr processed-results))))
 	   (sprintf 
-            "update ~A~A~A~A~A~A;"
+            "update ~A~A~A~A~A~A"
             (if (string? vals)
                 vals
                 (sprintf " ~A ~A " (car vals) (process-update-cols (cdr vals) "")))
@@ -467,7 +470,7 @@
               (limit         (caddr processed-results))
 	      (order-by      (cadddr processed-results)))
 	   (sprintf 
-            "delete from ~A~A~A~A;"
+            "delete from ~A~A~A~A"
             table
             (if (list? where-clause) 
                 (process-clause 'where where-clause "")
@@ -518,7 +521,7 @@
                         (set! vals (append vals (list (cadr pairs))))
                         (get-flds-and-vals (cddr pairs)))))
 	   (get-flds-and-vals pairs)
-	   (sprintf "~A values(~A);" (process-insert-cols (append (list table) flds)) (string-join vals ","))))
+	   (sprintf "~A values(~A)" (process-insert-cols (append (list table) flds)) (string-join vals ","))))
        (define (construct-cre-tmp-query distinct)
 	 (let* ((table-name 
 		 (if (>= (length exp) 1)
