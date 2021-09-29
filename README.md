@@ -107,7 +107,7 @@ sel-distinct ,sel, fr, jo, wh, ha, gr-by or-by, lim, ins, del
 **(scql sel-distinct (col1 (scql ->sel-distinct a fr b limit 1)) fr c)**
 
 
-**"select distinct col1,(select distinct a from b limit 1 ) from c;"**
+**"select distinct col1,(select distinct a from b limit 1 ) from c"**
 
 # select as
 
@@ -135,7 +135,7 @@ You can pass lists, strings, or numbers where applicable, literally or as variab
 
 will evaluate to 
 
-**"select print from list;"**,
+**"select print from list"**,
 
 but
 
@@ -146,4 +146,4 @@ but
 
 will evaluate to 
 
-**"select print,non-procedure-symbol-name from list,something-or-another;"**.
+**"select print,non-procedure-symbol-name from list,something-or-another"**.
