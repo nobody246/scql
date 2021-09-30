@@ -423,11 +423,19 @@
 	      (having-clause (cadddr processed-results))
 	      (limit    (car (cddddr processed-results)))
 	      (order-by (cadr (cddddr processed-results))))
+           (if (not (list? vals))
+               (throw-exception
+                "Invalid Query Syntax: Parameters for update must be passed as a list."))
+           (if (not (and
+                     (odd? (length vals))
+                     (> (length vals) 1)))
+               (throw-exception
+                (sprintf "~A ~A"
+                         "Invalid Query Syntax: Table and Column(s) list must contain table name"
+                         "and one or more value pairs.")))
 	   (sprintf 
             "update ~A~A~A~A~A~A"
-            (if (string? vals)
-                vals
-                (sprintf " ~A ~A " (car vals) (process-update-cols (cdr vals) "")))
+            (sprintf " ~A ~A " (car vals) (process-update-cols (cdr vals) ""))
             (if (and (list? join) (list? on))
                 (process-join join on)
                 "")
