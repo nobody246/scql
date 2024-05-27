@@ -1,6 +1,6 @@
 # scql
 
-I wrote this to check out what I can do with macros, and write MySQL queries as Chicken Scheme s-expressions so I get syntax highlighting and some extra compile time error checking.
+I wrote this to check out what I can do with macros, and write MySQL queries as Chicken Scheme s-expressions so I get syntax highlighting/formatting and some extra compile time error checking.
 
 I had fun making this, but this looks like it might be more mature for serious use https://bitbucket.org/DerGuteMoritz/ssql.
 
