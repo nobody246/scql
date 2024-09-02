@@ -1,3 +1,5 @@
+; scql (c) 2019-2024 Alex Semotan
+; scql is released under the MIT license.
 (use extras
      srfi-1
      srfi-13)
