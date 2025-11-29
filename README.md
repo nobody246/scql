@@ -3,6 +3,7 @@
 I wrote this to check out what I can do with macros, and write MySQL queries as Chicken Scheme s-expressions so I get syntax highlighting/formatting and some extra compile/run time error checking.
 
 I had fun making scql, but this looks like it might be more mature for serious use https://bitbucket.org/DerGuteMoritz/ssql.
+
 scql doesn't even behave like I assumed it would when compiled (i.e, in the same manner as when interpreted). It's just experimentation. Not anything I'd use if I were you.
 
 # syntax abbreviations
