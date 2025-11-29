@@ -144,6 +144,10 @@ but
 **(define y '(list something-or-another))**
 **(scql sel x from y)**
 
-will evaluate to 
+when interpreted will evaluate to 
 
 **"select print,non-procedure-symbol-name from list,something-or-another"**.
+
+...But this is only when interpreted because unless you export a symbol from a module eval treats it differently when compiled vs. interpreted, so make sure what you're doing works in the environment you're in. This kind of defeats the purpose of whatever I was going for here. When compiled, unless x and y was exported from a module (making it non-mutable) it would evaluate to
+
+**"select x from y"**.
